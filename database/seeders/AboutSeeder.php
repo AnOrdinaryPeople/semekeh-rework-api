@@ -15,10 +15,10 @@ class AboutSeeder extends Seeder
     {
         \App\Models\About::truncate();
         \App\Models\About::create([
-                'content' => 'SMK BPI Bandung adalah sebuah sekolah kejuruan yang dibawahi [Yayasan Badan Perguruan Indonesia]({yayasan_url}) , yang mempunyai 3 Program Studi keahlian yang sudah terakreditasi antara lain :
-- {otkp}
-- {rpl}
-- {tkj}
+                'content' => 'SMK BPI Bandung adalah sebuah sekolah kejuruan yang dibawahi [Yayasan Badan Perguruan Indonesia](http://www.bpiedu.id/) , yang mempunyai 3 Program Studi keahlian yang sudah terakreditasi antara lain :
+- Otomatisasi dan Tata Kelola Perkantoran
+- Rekayasa Perangkat Lunak
+- Teknik Komputer Jaringan
 
 [Profil SMK BPI]('.url('profile/public').')',
                 'url' => 'homepage/about.webp'

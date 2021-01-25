@@ -15,10 +15,10 @@ class KeywordSeeder extends Seeder
     {
         $a = [
             ['{yayasan_url}', 'http://www.bpiedu.id'],
-            ['{bpi}', 'Badan Perguruan Indonesia'],
-            ['{otkp}', 'Otomatisasi dan Tata Kelola Perkantoran'],
-            ['{rpl}', 'Rekayasa Perangkat Lunak'],
-            ['{tkj}', 'Teknik Komputer dan Jaringan'],
+            // ['{bpi}', 'Badan Perguruan Indonesia'],
+            // ['{otkp}', 'Otomatisasi dan Tata Kelola Perkantoran'],
+            // ['{rpl}', 'Rekayasa Perangkat Lunak'],
+            // ['{tkj}', 'Teknik Komputer dan Jaringan'],
         ];
         $t = now();
 
