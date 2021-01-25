@@ -25,9 +25,9 @@ Sekolah Menegah Kejuruan BPI Bandung adalah salah satu Sekolah berbasis Teknolog
 Sekolah yang mempunyai letak strategis pada pusat Kota Bandung, yang menjadikan mobilitas Sekolah Menengah Kejuruan BPI Bandung menjadi mudah diakses. Dan Di lengkapi pula dengan pendidik yang berkompeten dan ahli pada setiap Program Studinya.
 
 Program Studi pada SMK BPI Bandung antara lain :
-- {otkp}
-- {rpl}
-- {tkj}',
+- Otomatisasi dan Tata Kelola Perkantoran
+- Rekayasa Perangkat Lunak
+- Teknik Komputer Jaringan',
                 ],
                 'img' => ['public-7.jpg', 'public-6.jpg', 'public-5.jpg', 'public-4.jpg', 'public-3.jpg', 'public-2.jpg', 'public-1.jpg']
             ], [
