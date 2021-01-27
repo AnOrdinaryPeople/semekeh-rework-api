@@ -28,7 +28,7 @@ class CreateEmployeesTable extends Migration
             $table->tinyInteger('child_type')->default(0);
             $table->string('name');
             $table->string('title');
-            $table->string('url')->default('img/user.webp');
+            $table->string('url')->default('user.webp');
             $table->timestamps();
         });
     }
