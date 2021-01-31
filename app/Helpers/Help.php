@@ -134,3 +134,14 @@ function timer($str = ''){
             return 259200; // 3 days
     }
 }
+
+/**
+ * Return front end url with path
+ * 
+ * @param string $str
+ * 
+ * @return string
+ */
+function feUrl($str = ''){
+    return config('front_end_url').'/'.$str;
+}

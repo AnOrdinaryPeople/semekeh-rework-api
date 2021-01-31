@@ -13,10 +13,10 @@ class MetaSeeder extends Seeder
      */
     public function run()
     {
-        $ttl = config('app.name', 'SMK BPI');
+        $ttl = config('app_name');
         $dsc = 'Bermartabat Berkualitas dan Tepercaya';
-        $img = asset('img/logo.webp');
-        $url = url('/');
+        $img = feUrl('img/logo.webp');
+        $url = feUrl();
         $key = 'SMK BPI, SMK, BPI, RPL, OTKP, TKJ, Berkualitas, Bermartabat, Tepercaya';
 
         $a = [

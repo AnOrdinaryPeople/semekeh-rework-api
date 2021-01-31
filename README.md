@@ -26,6 +26,7 @@ $ cp .env.example .env
 
 # setup environment
 # APP_URL=http://localhost:8000
+# FE_URL=http://localhost:3000
 # DB_DATABASE=db_smk_rework
 # RECAPTCHA_SITE_KEY=YOUR_RECAPTCHA_SITE_KEY
 # RECAPTCHA_SECRET=YOUR_RECAPTCHA_SECRET_KEY

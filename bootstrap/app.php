@@ -61,6 +61,13 @@ $app->singleton(
 
 $app->configure('app');
 
+config([
+    'app_name' => env('APP_NAME', 'SMK BPI'),
+    'front_end_url' => env('FE_URL', 'http://localhost:3000'),
+    'recaptcha_site' => env('RECAPTCHA_SITE_KEY'),
+    'recaptcha_secret' => env('RECAPTCHA_SECRET'),
+]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware

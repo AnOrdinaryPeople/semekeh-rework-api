@@ -17,7 +17,7 @@ class Recaptcha implements ImplicitRule
     public function passes($attribute, $value)
     {
         $req = Http::post('https://google.com/recaptcha/api/siteverify?'.http_build_query([
-            'secret' => config('services.recaptcha.secret'),
+            'secret' => config('recaptcha_secret'),
             'response' => $value,
             'remoteip' => request()->ip()
         ]));
