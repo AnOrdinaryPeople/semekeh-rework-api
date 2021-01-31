@@ -2,103 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menu;
-use App\Models\Permission;
 use App\Models\User;
-use App\Http\Requests\AuthRequest;
-use App\Http\Requests\AuthUpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Rules\Recaptcha;
 
 class AuthController extends Controller
 {
-    public function login(AuthRequest $req){
-        if($req->val && $req->val->fails())
-            return response($req->val->errors(), 422);
-        else{
-            $user = User::where('email', $req->email)->first();
+    public function login(Request $req){
+        $this->validate($req, [
+            'email' => 'required|email',
+            'password' => 'required',
+            'recaptcha' => ['required', new Recaptcha]
+        ]);
 
-            if(!$user || !Hash::check($req->password, $user->password) || !$user->is_active)
-                return response(['email' => __('auth.failed')], 422);
-            else{
-                return response([
-                    'user' => User::getUser($user->id),
-                    'token' => $user->createToken('auth-token')->plainTextToken,
-                    'access' => Permission::getAccess($user->role_id),
-                    'menu' => Menu::getMenu()
-                ]);
-            }
-        }
+        if($token = app('auth')->attempt($req->only('email', 'password')))
+            return response()->json(compact('token'));
+        else
+            return response(['email' => __('auth.failed')], 401);
     }
-    public function logout($id){
+
+    public function update($id, Request $req){
+        $this->validate($req, [
+            'name' => 'required|string',
+            'pass' => 'required|string',
+            'password' => 'nullable|confirmed'
+        ]);
+
         try {
             DB::beginTransaction();
 
             if($check = User::find($id)){
-                $check->tokens()->delete();
-
-                $r = response(['status' => true]);
-                DB::commit();
+                if(Hash::check($req->pass, $check->password)){
+                    $check->update([
+                        'name' => $req->name,
+                        'password' => $req->password
+                            ? Hash::make($req->password)
+                            : $check->password
+                    ]);
+    
+                    $r = response([
+                        'message' => __('label.success.update', [
+                            'data' => __('label.profile')
+                        ])
+                    ]);
+                    DB::commit();
+                }else{
+                    $r = response(['message' => __('auth.failed')], 422);
+                    DB::rollback();
+                }
             }else{
-                $r = response(['error' => __('auth.not_found')], 422);
+                $r = response([
+                    'message' => __('label.error.not_found', [
+                        'data' => __('label.footer')
+                    ])
+                ], 422);
                 DB::rollback();
             }
         } catch (Exception $e) {
-            $r = response(['server' => __('auth.server_error')], 500);
+            $r = response(['message' => __('auth.server_error')], 500);
             DB::rollback();
         }
-        return $r;
-    }
-    public function getUser(Request $req){
-        $a = $req->user();
 
-        return response([
-            'user' => User::getuser($a->id),
-            'access' => Permission::getAccess($a->id)
-        ]);
-    }
-    public function update(AuthUpdateRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
-
-                $a = $req->user();
-
-                if($check = User::find($a->id)){
-                    if(Hash::check($req->pass, $check->password)){
-                        $check->update([
-                            'name' => $req->name,
-                            'password' => $req->password
-                                ? Hash::make($req->password)
-                                : $check->password
-                        ]);
-        
-                        $r = response([
-                            'message' => __('label.success.update', [
-                                'data' => __('label.profile')
-                            ])
-                        ]);
-                        DB::commit();
-                    }else{
-                        $r = response(['message' => __('auth.failed')], 422);
-                        DB::rollback();
-                    }
-                }else{
-                    $r = response([
-                        'message' => __('label.error.not_found', [
-                            'data' => __('label.footer')
-                        ])
-                    ], 422);
-                    DB::rollback();
-                }
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
-        }
         return $r;
     }
 }

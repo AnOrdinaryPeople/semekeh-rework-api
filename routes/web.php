@@ -27,3 +27,9 @@ $router->get('prestation', 'WelcomeController@prestation');
 $router->get('gallery', 'WelcomeController@gallery');
 $router->get('employee', 'WelcomeController@employee');
 $router->get('search', 'WelcomeController@search');
+
+$router->post('auth/login', 'AuthController@login');
+
+$router->group(['prefix' => 'admin', 'middleware' => 'auth'], function() use ($router){
+    //
+});

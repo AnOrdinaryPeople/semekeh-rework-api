@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Menu;
+use App\Models\Permission;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Model
+class User extends Model implements Auditable, JWTSubject, AuthenticatableContract
 {
-    use \OwenIt\Auditing\Auditable;
+    use Authenticatable,
+        \OwenIt\Auditing\Auditable;
 
     /**
      * The attributes that are mass assignable.
@@ -41,9 +47,22 @@ class User extends Model
         'email_verified_at' => 'datetime',
     ];
 
-    public static function getUser($id){
-        return self::join('roles', 'roles.id', '=', 'role_id')
+    public function getUser($id){
+        return $this->join('roles', 'roles.id', '=', 'role_id')
             ->where('users.id', $id)
             ->first(['users.id', 'users.name', 'email', 'roles.name as role']);
+    }
+
+    public function getJWTIdentifier(){
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [
+            'user' => $this->getUser($this->id),
+            'access' => Permission::getAccess($this->role_id),
+            'menu' => Menu::getMenu()
+        ];
     }
 }

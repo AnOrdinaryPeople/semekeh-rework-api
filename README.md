@@ -36,6 +36,9 @@ $ composer install
 # run migrate and seeder command
 $ php artisan migrate --seed
 
+# Generate secret key
+$ php artisan jwt:secret
+
 # serve
 $ php -S localhost:8000 -t public
 ```

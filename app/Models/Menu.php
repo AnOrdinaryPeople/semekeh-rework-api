@@ -12,15 +12,13 @@ class Menu extends Model
 
         foreach($parent as $s){
             $result[$i] = [
-                'icon' => $s->icon,
                 'name' => $s->name,
                 'link' => $s->link
             ];
             $getParent = self::whereParentId($s->id)->get();
-            
+
             foreach($getParent as $c){
                 $result[$i]['children'][] = [
-                    'icon' => $c->icon,
                     'name' => $c->name,
                     'link' => $result[$i]['link'].$c->link
                 ];
