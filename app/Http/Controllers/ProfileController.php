@@ -84,9 +84,10 @@ class ProfileController extends Controller
                 $a = Gallery::create([
                     'target' => 1,
                     'type' => $id,
-                    'url' => $req->file('url')->store('profile', 'public')
+                    // 'url' => $req->file('url')->store('profile', 'public')
+                    'url' => storeImage('url', 'profile')
                 ]);
-                imgCompress($a->url);
+                // imgCompress($a->url);
 
                 $r = response([
                     'message' => __('label.success.create', [

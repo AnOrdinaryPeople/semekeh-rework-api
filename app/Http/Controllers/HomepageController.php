@@ -28,8 +28,9 @@ class HomepageController extends Controller
             if($req->url != 'null'){
                 Storage::disk('public')->delete($a->url);
 
-                $img = $req->file('url')->store('homepage', 'public');
-                imgCompress($img);
+                // $img = $req->file('url')->store('homepage', 'public');
+                // imgCompress($img);
+                $img = storeImage('url', 'homepage');
             }else $img = $a->url;
 
             $a->update([

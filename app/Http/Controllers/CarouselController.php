@@ -24,9 +24,10 @@ class CarouselController extends Controller
                     'type' => $req->type,
                     'title' => $req->title,
                     'description' => $req->description,
-                    'url' => $req->file('url')->store('homepage', 'public')
+                    // 'url' => $req->file('url')->store('homepage', 'public')
+                    'url' => storeImage('url', 'homepage')
                 ]);
-                imgCompress($v->url);
+                // imgCompress($v->url);
 
                 $r = response([
                     'message' => __('label.success.create', [
@@ -49,8 +50,9 @@ class CarouselController extends Controller
                 if($req->url != 'null'){
                     Storage::disk('public')->delete($check->url);
 
-                    $url = $req->file('url')->store('homepage', 'public');
-                    imgCompress($url);
+                    // $url = $req->file('url')->store('homepage', 'public');
+                    // imgCompress($url);
+                    $url = storeImage('url', 'homepage');
                 }else $url = $check->url;
 
                 $check->update([

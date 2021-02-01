@@ -26,8 +26,9 @@ class StudyController extends Controller
                     if(!empty($req->banner) && $req->banner != 'null'){
                         Storage::disk('public')->delete($check->banner);
 
-                        $url = $req->file('banner')->store('study', 'public');
-                        imgCompress($url);
+                        // $url = $req->file('banner')->store('study', 'public');
+                        // imgCompress($url);
+                        $url = storeImage('banner', 'study');
                     }else $url = $check->banner;
 
                     $content = json_decode($check->content_2);
@@ -35,8 +36,9 @@ class StudyController extends Controller
                     if(!empty($req->url) && $req->url != 'null'){
                         Storage::disk('public')->delete($content->url);
 
-                        $urll = $req->file('url')->store('study', 'public');
-                        imgCompress($url);
+                        // $urll = $req->file('url')->store('study', 'public');
+                        // imgCompress($url);
+                        $urll = storeImage('url', 'study');
                     }else $urll = $content->url;
 
                     $content = [

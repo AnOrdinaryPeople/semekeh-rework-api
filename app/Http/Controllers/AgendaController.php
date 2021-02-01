@@ -38,9 +38,10 @@ class AgendaController extends Controller
                     'time' => $req->time,
                     'content' => $req->content,
                     'slug' => kebabCase(strtotime(now()).' '.$req->title),
-                    'banner' => $req->file('banner')->store('agenda', 'public')
+                    // 'banner' => $req->file('banner')->store('agenda', 'public')
+                    'banner' => storeImage('banner', 'agenda')
                 ]);
-                imgCompress($v->banner);
+                // imgCompress($v->banner);
 
                 $r = response([
                     'message' => __('label.success.create', [
@@ -63,8 +64,9 @@ class AgendaController extends Controller
                 if($req->banner != 'null'){
                     Storage::disk('public')->delete($check->banner);
 
-                    $url = $req->file('banner')->store('agenda', 'public');
-                    imgCompress($url);
+                    // $url = $req->file('banner')->store('agenda', 'public');
+                    // imgCompress($url);
+                    $url = storeImage('banner', 'agenda');
                 }else $url = $check->banner;
 
                 if($req->title !== $check->title)
@@ -146,9 +148,10 @@ class AgendaController extends Controller
                 $a = Gallery::create([
                     'target' => 3,
                     'type' => $id,
-                    'url' => $req->file('url')->store('agenda', 'public')
+                    // 'url' => $req->file('url')->store('agenda', 'public')
+                    'url' => storeImage('url', 'agenda')
                 ]);
-                imgCompress($a->url);
+                // imgCompress($a->url);
 
                 $r = response([
                     'message' => __('label.success.create', [

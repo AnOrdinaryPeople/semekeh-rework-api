@@ -91,22 +91,42 @@ function kebabCase($text){
 }
 
 /**
- * This should be compress the image
- * with correct storage path.
+ * Convert jpeg/jpg/png/gif to webp
+ * for better performance.
  * 
- * @param any $path
+ * @param string|array $path
  * 
- * @return \Intervention\Image\Image|boolean
+ * @return boolean
  */
 function imgCompress($path){
     if(is_array($path)){
         foreach($path as $p)
             imgCompress($p);
     }else{
-        $a = pathinfo($path)['extension'];
+        $a = pathinfo($path);
+        $p = appStoragePath($path);
 
-        if($a === 'jpg' || $a === 'jpeg' || $a === 'png')
-            return \Image::make(appStoragePath($path))->save();
+        switch ($a['extension']) {
+            case 'jpeg':
+            case 'jpg':
+                $img = imagecreatefromjpeg($p);
+                break;
+            case 'png':
+                $img = imagecreatefrompng($p);
+                break;
+            case 'gif':
+                $img = imagecreatefromgif($p);
+                break;
+
+            default:
+                return false;
+        }
+
+        imagepalettetotruecolor($img);
+        imagewebp($img, $p.$a['filename'].'webp');
+        imagedestroy($img);
+
+        return true;
     }
     
     return false;
@@ -144,4 +164,23 @@ function timer($str = ''){
  */
 function feUrl($str = ''){
     return config('front_end_url').'/'.$str;
+}
+
+/**
+ * Simplify store image with compression.
+ * 
+ * @param string $name
+ * @param string $path
+ * @param Request $req
+ * 
+ * @return string
+ */
+function storeImage($name, $path, Request $req){
+    $file = $req->file($name)->store($path, 'public');
+    $f = pathinfo($file);
+
+    if($f['extension'] !== 'webp')
+        imgCompress($file);
+
+    return $path.'/'.$f['filename'].'webp';
 }

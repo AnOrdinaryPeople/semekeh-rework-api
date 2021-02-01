@@ -21,10 +21,11 @@ class VideoController extends Controller
                 DB::beginTransaction();
 
                 $v = Video::create([
-                    'thumbnail' => $req->file('thumbnail')->store('homepage', 'public'),
+                    // 'thumbnail' => $req->file('thumbnail')->store('homepage', 'public'),
+                    'thumbnail' => storeImage('thumbnail', 'homepage'),
                     'video' => $req->video
                 ]);
-                imgCompress($v->thumbnail);
+                // imgCompress($v->thumbnail);
 
                 $r = response([
                     'message' => __('label.success.create', [
@@ -47,8 +48,9 @@ class VideoController extends Controller
                 if($req->thumbnail != 'null'){
                     Storage::disk('public')->delete($check->thumbnail);
 
-                    $thumb = $req->file('thumbnail')->store('homepage', 'public');
-                    imgCompress($thumb);
+                    // $thumb = $req->file('thumbnail')->store('homepage', 'public');
+                    // imgCompress($thumb);
+                    $thumb = storeImage('thumbnail', 'homepage');
                 }else $thumb = $check->thumbnail;
 
                 if($req->video != 'null'){

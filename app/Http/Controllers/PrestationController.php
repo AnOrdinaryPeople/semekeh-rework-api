@@ -24,9 +24,10 @@ class PrestationController extends Controller
                     'title' => $req->title,
                     'rank' => $req->rank,
                     'year' => $req->year,
-                    'url' => $req->file('url')->store('prestation', 'public')
+                    // 'url' => $req->file('url')->store('prestation', 'public')
+                    'url' => storeImage('url', 'prestation')
                 ]);
-                imgCompress($v->url);
+                // imgCompress($v->url);
 
                 $r = response([
                     'message' => __('label.success.create', [
@@ -49,8 +50,9 @@ class PrestationController extends Controller
                 if($req->url != 'null'){
                     Storage::disk('public')->delete($check->url);
 
-                    $url = $req->file('url')->store('prestation', 'public');
-                    imgCompress($url);
+                    // $url = $req->file('url')->store('prestation', 'public');
+                    // imgCompress($url);
+                    $url = storeImage('url', 'prestation');
                 }else $url = $check->url;
 
                 $check->update([

@@ -20,9 +20,10 @@ class GalleryController extends Controller
                 DB::beginTransaction();
 
                 $a = Gallery::create([
-                    'url' => $req->file('url')->store('gallery', 'public')
+                    // 'url' => $req->file('url')->store('gallery', 'public')
+                    'url' => storeImage('url', 'gallery')
                 ]);
-                imgCompress($a->url);
+                // imgCompress($a->url);
 
                 $r = response([
                     'message' => __('label.success.create', [

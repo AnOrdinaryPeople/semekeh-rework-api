@@ -32,9 +32,10 @@ class EmployeeController extends Controller
                     'title' => $req->title,
                     'type' => $req->type,
                     'child_type' => $req->type == 1 ? 3 : 0,
-                    'url' => $req->file('url')->store('employees', 'public')
+                    // 'url' => $req->file('url')->store('employees', 'public')
+                    'url' => storeImage('url', 'employees')
                 ]);
-                imgCompress($v->url);
+                // imgCompress($v->url);
 
                 $r = response([
                     'message' => __('label.success.create', [
@@ -58,8 +59,9 @@ class EmployeeController extends Controller
                     if($check->url !== 'user.png')
                         Storage::disk('public')->delete($check->url);
 
-                    $url = $req->file('url')->store('employees', 'public');
-                    imgCompress($url);
+                    // $url = $req->file('url')->store('employees', 'public');
+                    // imgCompress($url);
+                    $url = storeImage('url', 'employees');
                 }else $url = $check->url;
 
                 $check->update([
