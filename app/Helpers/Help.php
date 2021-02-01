@@ -123,7 +123,7 @@ function imgCompress($path){
         }
 
         imagepalettetotruecolor($img);
-        imagewebp($img, $p.$a['filename'].'webp');
+        imagewebp($img, $p.$a['filename'].'.webp');
         imagedestroy($img);
 
         return true;
@@ -182,5 +182,5 @@ function storeImage($name, $path, Request $req){
     if($f['extension'] !== 'webp')
         imgCompress($file);
 
-    return $path.'/'.$f['filename'].'webp';
+    return $path.'/'.$f['filename'].'.webp';
 }
