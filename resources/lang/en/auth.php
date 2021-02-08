@@ -17,6 +17,7 @@ return [
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'server_error' => 'Internal server error.',
     'not_found' => 'User not found.',
+    'logout' => 'Successfully logged out',
     'recaptcha' => [
         'failed' => 'Verification failed, please try again.'
     ]

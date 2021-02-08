@@ -13,14 +13,14 @@ class CreateMenusTable extends Migration
      */
     public function up()
     {
-        Schema::create('menus', function (Blueprint $table) {
-            $table->id();
-            $table->string('icon')->nullable();
-            $table->string('name');
-            $table->string('link')->default('#');
-            $table->integer('parent_id')->default(0);
-            $table->timestamps();
-        });
+        // Schema::create('menus', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('icon')->nullable();
+        //     $table->string('name');
+        //     $table->string('link')->default('#');
+        //     $table->integer('parent_id')->default(0);
+        //     $table->timestamps();
+        // });
     }
 
     /**
@@ -30,6 +30,6 @@ class CreateMenusTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('menus');
+        // Schema::dropIfExists('menus');
     }
 }

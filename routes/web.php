@@ -13,6 +13,10 @@
 |
 */
 
+$router->get('/', function(){
+	return response(['link' => 'https://bit.ly/314jniD']);
+});
+
 $router->get('meta', 'WelcomeController@meta');
 $router->get('navbar', 'WelcomeController@navbar');
 $router->get('footer', 'WelcomeController@footer');
@@ -28,8 +32,13 @@ $router->get('gallery', 'WelcomeController@gallery');
 $router->get('employee', 'WelcomeController@employee');
 $router->get('search', 'WelcomeController@search');
 
-$router->post('auth/login', 'AuthController@login');
+$router->group(['prefix' => 'api/auth'], function() use ($router){
+    $router->post('login', 'AuthController@login');
+    $router->post('logout', 'AuthController@logout');
+    $router->post('refresh', 'AuthController@refresh');
+    $router->get('user', 'AuthController@me');
+});
 
-$router->group(['prefix' => 'admin', 'middleware' => 'auth'], function() use ($router){
+$router->group(['prefix' => 'admin', 'middleware' => ['auth']], function() use ($router){
     //
 });

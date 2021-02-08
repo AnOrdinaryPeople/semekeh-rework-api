@@ -10,6 +10,11 @@ use App\Rules\Recaptcha;
 
 class AuthController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['login']]);
+    }
+
     public function login(Request $req){
         $this->validate($req, [
             'email' => 'required|email',
@@ -20,7 +25,29 @@ class AuthController extends Controller
         if($token = app('auth')->attempt($req->only('email', 'password')))
             return response()->json(compact('token'));
         else
-            return response(['email' => __('auth.failed')], 401);
+            return response(['message' => __('auth.failed')], 401);
+    }
+
+    public function logout(){
+        app('auth')->logout();
+
+        return response()->json(['message' => __('auth.logout')]);
+    }
+
+    public function refresh(){
+        return $this->respondWithToken(app('auth')->refresh());
+    }
+
+    protected function respondWithToken($token){
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => app('auth')->factory()->getTTL() * 60
+        ]);
+    }
+
+    public function me(){
+        return response()->json(app('auth')->user());
     }
 
     public function update($id, Request $req){

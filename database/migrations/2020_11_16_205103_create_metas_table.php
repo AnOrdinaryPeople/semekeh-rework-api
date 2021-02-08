@@ -13,13 +13,13 @@ class CreateMetasTable extends Migration
      */
     public function up()
     {
-        Schema::create('metas', function (Blueprint $table) {
-            $table->id();
-            $table->string('type')->nullable();
-            $table->string('key');
-            $table->string('value');
-            $table->timestamps();
-        });
+        // Schema::create('metas', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('type')->nullable();
+        //     $table->string('key');
+        //     $table->string('value');
+        //     $table->timestamps();
+        // });
     }
 
     /**
@@ -29,6 +29,6 @@ class CreateMetasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('metas');
+        // Schema::dropIfExists('metas');
     }
 }
