@@ -20,7 +20,7 @@ class GalleryController extends Controller
             DB::beginTransaction();
 
             Gallery::create([
-                'url' => storeImage('url', 'gallery')
+                'url' => storeImage('url', 'gallery', $req)
             ]);
 
             $r = response([

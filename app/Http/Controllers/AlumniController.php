@@ -27,7 +27,7 @@ class AlumniController extends Controller
                 'name' => ucfirst($req->name),
                 'company' => $req->company,
                 'content' => $req->content,
-                'url' => storeImage('url', 'homepage')
+                'url' => storeImage('url', 'homepage', $req)
             ]);
 
             $r = response([
@@ -54,10 +54,10 @@ class AlumniController extends Controller
             DB::beginTransaction();
 
             if($check = Alumni::find($id)){
-                if($req->file('url')){
+                if($req->hasFile('url')){
                     File::delete(toPath($check->url));
 
-                    $url = storeImage('url', 'homepage');
+                    $url = storeImage('url', 'homepage', $req);
                 }else $url = $check->url;
 
                 $check->update([

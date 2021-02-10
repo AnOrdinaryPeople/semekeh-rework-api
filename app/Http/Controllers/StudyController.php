@@ -33,18 +33,18 @@ class StudyController extends Controller
             DB::beginTransaction();
 
             if($check = Study::find($id)){
-                if(!empty($req->banner) && $req->file('banner')){
+                if(!empty($req->banner) && $req->hasFile('banner')){
                     File::delete(toPath($check->banner));
 
-                    $url = storeImage('banner', 'study');
+                    $url = storeImage('banner', 'study', $req);
                 }else $url = $check->banner;
 
                 $content = json_decode($check->content_2);
 
-                if(!empty($req->url) && $req->file('url')){
+                if(!empty($req->url) && $req->hasFile('url')){
                     File::delete(toPath($content->url));
 
-                    $urll = storeImage('url', 'study');
+                    $urll = storeImage('url', 'study', $req);
                 }else $urll = $content->url;
 
                 $content = [

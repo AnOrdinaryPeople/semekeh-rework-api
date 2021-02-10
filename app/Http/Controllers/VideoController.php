@@ -22,7 +22,7 @@ class VideoController extends Controller
             DB::beginTransaction();
 
             Video::create([
-                'thumbnail' => storeImage('thumbnail', 'homepage'),
+                'thumbnail' => storeImage('thumbnail', 'homepage', $req),
                 'video' => $req->video
             ]);
 

@@ -29,6 +29,17 @@ function now($timezone = null){
 }
 
 /**
+ * public path
+ * 
+ * @param string $str
+ * 
+ * @return string
+ */
+function public_path($str = ''){
+    return app()->basePath().DIRECTORY_SEPARATOR.'public'.($str ? DIRECTORY_SEPARATOR.$str : $str);
+}
+
+/**
  * asset URL
  * 
  * @param $path
@@ -54,7 +65,7 @@ function asset($path, $secured = false) {
  * 
  * @return string
  */
-function appStoragePath($path){
+function appStoragePath($path = ''){
     return public_path('storage'.DIRECTORY_SEPARATOR.$path);
 }
 
@@ -104,7 +115,7 @@ function imgCompress($path){
             imgCompress($p);
     }else{
         $a = pathinfo($path);
-        $p = appStoragePath($path);
+        $p = $path;
 
         switch ($a['extension']) {
             case 'jpeg':
@@ -123,8 +134,8 @@ function imgCompress($path){
         }
 
         imagepalettetotruecolor($img);
-        imagewebp($img, $p.$a['filename'].'.webp');
-        imagedestroy($img);
+        imagewebp($img, $a['dirname'].DIRECTORY_SEPARATOR.$a['filename'].'.webp');
+        unlink($path);
 
         return true;
     }
@@ -175,9 +186,9 @@ function feUrl($str = ''){
  * 
  * @return string
  */
-function storeImage($name, $path, Request $req){
-    $file = $req->file($name)->store($path, 'public');
-    $f = pathinfo($file);
+function storeImage($name, $path, $req){
+    $f = pathinfo($req->file($name)->store($path, 'public'));
+    $file = $req->file($name)->move(appStoragePath($path), $f['basename']);
 
     if($f['extension'] !== 'webp')
         imgCompress($file);
@@ -194,5 +205,5 @@ function storeImage($name, $path, Request $req){
  * @return string
  */
 function toPath($str, $bool = true){
-    return str_replace('/', DIRECTORY_SEPARATOR, ($bool ? public_path('storage') : '').$str);
+    return str_replace('/', DIRECTORY_SEPARATOR, ($bool ? appStoragePath() : '').$str);
 }

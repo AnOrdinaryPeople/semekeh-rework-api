@@ -40,7 +40,7 @@ class AgendaController extends Controller
                 'time' => $req->time,
                 'content' => $req->content,
                 'slug' => kebabCase(strtotime(now()).' '.$req->title),
-                'banner' => storeImage('banner', 'agenda')
+                'banner' => storeImage('banner', 'agenda', $req)
             ]);
 
             $r = response([
@@ -67,10 +67,10 @@ class AgendaController extends Controller
             DB::beginTransaction();
 
             if($check = Agenda::find($id)){
-                if($req->file('banner')){
+                if($req->hasFile('banner')){
                     File::delete(toPath($check->banner));
 
-                    $url = storeImage('banner', 'agenda');
+                    $url = storeImage('banner', 'agenda', $req);
                 }else $url = $check->banner;
 
                 if($req->title !== $check->title)
@@ -152,7 +152,7 @@ class AgendaController extends Controller
             Gallery::create([
                 'target' => 3,
                 'type' => $id,
-                'url' => storeImage('url', 'agenda')
+                'url' => storeImage('url', 'agenda', $req)
             ]);
 
             $r = response([

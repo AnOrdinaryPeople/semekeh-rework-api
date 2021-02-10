@@ -85,7 +85,7 @@ class ProfileController extends Controller
             Gallery::create([
                 'target' => 1,
                 'type' => $id,
-                'url' => storeImage('url', 'profile')
+                'url' => storeImage('url', 'profile', $req)
             ]);
 
             $r = response([

@@ -27,7 +27,7 @@ class CarouselController extends Controller
                 'type' => $req->type,
                 'title' => $req->title,
                 'description' => $req->description,
-                'url' => storeImage('url', 'homepage')
+                'url' => storeImage('url', 'homepage', $req)
             ]);
 
             $r = response([
@@ -54,10 +54,10 @@ class CarouselController extends Controller
             DB::beginTransaction();
 
             if($check = Carousel::find($id)){
-                if($req->file('url')){
+                if($req->hasFile('url')){
                     File::delete(toPath($check->url));
 
-                    $url = storeImage('url', 'homepage');
+                    $url = storeImage('url', 'homepage', $req);
                 }else $url = $check->url;
 
                 $check->update([

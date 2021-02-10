@@ -34,7 +34,7 @@ class EmployeeController extends Controller
                 'title' => $req->title,
                 'type' => $req->type,
                 'child_type' => $req->type == 1 ? 3 : 0,
-                'url' => storeImage('url', 'employees')
+                'url' => storeImage('url', 'employees', $req)
             ]);
 
             $r = response([
@@ -61,11 +61,11 @@ class EmployeeController extends Controller
             DB::beginTransaction();
 
             if($check = Employee::find($id)){
-                if($req->file('url')){
+                if($req->hasFile('url')){
                     if($check->url !== 'user.png')
                         File::delete(toPath($check->url));
 
-                    $url = storeImage('url', 'employees');
+                    $url = storeImage('url', 'employees', $req);
                 }else $url = $check->url;
 
                 $check->update([
@@ -135,7 +135,7 @@ class EmployeeController extends Controller
 
             Gallery::create([
                 'target' => 4,
-                'url' => storeImage('url', 'employees'),
+                'url' => storeImage('url', 'employees', $req),
             ]);
 
             $r = response([

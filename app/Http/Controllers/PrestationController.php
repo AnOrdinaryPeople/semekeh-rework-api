@@ -27,7 +27,7 @@ class PrestationController extends Controller
                 'title' => $req->title,
                 'rank' => $req->rank,
                 'year' => $req->year,
-                'url' => storeImage('url', 'prestation')
+                'url' => storeImage('url', 'prestation', $req, $req)
             ]);
 
             $r = response([
@@ -54,10 +54,10 @@ class PrestationController extends Controller
             DB::beginTransaction();
 
             if($check = Pres::find($id)){
-                if($req->file('url')){
+                if($req->hasFile('url')){
                     File::delete(toPath($check->url));
 
-                    $url = storeImage('url', 'prestation');
+                    $url = storeImage('url', 'prestation', $req);
                 }else $url = $check->url;
 
                 $check->update([

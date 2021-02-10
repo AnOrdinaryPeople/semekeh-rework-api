@@ -30,7 +30,7 @@ class HomepageController extends Controller
             if($req->url != 'null'){
                 File::delete(toPath($a->url));
 
-                $img = storeImage('url', 'homepage');
+                $img = storeImage('url', 'homepage', $req);
             }else $img = $a->url;
 
             $a->update([
