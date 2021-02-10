@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Council;
 use App\Models\Gallery;
 use App\Models\Profile;
-use App\Http\Requests\GalleryRequest;
-use App\Http\Requests\ProfileRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class ProfileController extends Controller
 {
@@ -43,62 +41,62 @@ class ProfileController extends Controller
         }
         return $r;
     }
-    public function update($id, ProfileRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function update($id, Request $req){
+        $this->validate($req, [
+            'title' => 'required|string',
+            'subtitle' => 'nullable|string',
+            'content' => 'required|string',
+        ]);
 
-                if($check = Profile::find($id)){
-                    $check->update($req->all());
+        try {
+            DB::beginTransaction();
 
-                    $r = response([
-                        'message' => __('label.success.update', [
-                            'data' => $check->title
-                        ])
-                    ]);
-                    DB::commit();
-                }else{
-                    $r = response([
-                        'message' => __('label.error.not_found', [
-                            'data' => __('label.profile')
-                        ])
-                    ], 422);
-                    DB::rollback();
-                }
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
-        }
-        return $r;
-    }
-    public function createImg($id, GalleryRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
-
-                $a = Gallery::create([
-                    'target' => 1,
-                    'type' => $id,
-                    // 'url' => $req->file('url')->store('profile', 'public')
-                    'url' => storeImage('url', 'profile')
-                ]);
-                // imgCompress($a->url);
+            if($check = Profile::find($id)){
+                $check->update($req->all());
 
                 $r = response([
-                    'message' => __('label.success.create', [
-                        'data' => __('label.image')
+                    'message' => __('label.success.update', [
+                        'data' => $check->title
                     ])
                 ]);
                 DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
+            }else{
+                $r = response([
+                    'message' => __('label.error.not_found', [
+                        'data' => __('label.profile')
+                    ])
+                ], 422);
                 DB::rollback();
             }
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
+        }
+        return $r;
+    }
+    public function createImg($id, Request $req){
+        $this->validate($req, [
+            'url' => 'required|mimes:jpg,jpeg,png,webp|max:2048000',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            Gallery::create([
+                'target' => 1,
+                'type' => $id,
+                'url' => storeImage('url', 'profile')
+            ]);
+
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.image')
+                ])
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
         }
         return $r;
     }
@@ -107,9 +105,7 @@ class ProfileController extends Controller
             DB::beginTransaction();
 
             if($check = Gallery::find($id)){
-                $s = Storage::disk('public');
-
-                $s->delete($check->url);
+                File::delete(toPath($check->url));
 
                 $check->delete();
 

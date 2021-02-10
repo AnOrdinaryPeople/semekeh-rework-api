@@ -2,56 +2,61 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CarouselRequest;
 use App\Models\Carousel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class CarouselController extends Controller
 {
     public function table(){
         return response(Carousel::latest()->get());
     }
-    public function create(CarouselRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function create(Request $req){
+        $this->validate($req, [
+            'type' => 'required|numeric|min:1|max:2',
+            'title' => 'required|string',
+            'description' => 'nullable|string',
+            'url' => 'required|mimes:jpg,jpeg,png,webp|max:2048000'
+        ]);
 
-                $v = Carousel::create([
-                    'type' => $req->type,
-                    'title' => $req->title,
-                    'description' => $req->description,
-                    // 'url' => $req->file('url')->store('homepage', 'public')
-                    'url' => storeImage('url', 'homepage')
-                ]);
-                // imgCompress($v->url);
+        try {
+            DB::beginTransaction();
 
-                $r = response([
-                    'message' => __('label.success.create', [
-                        'data' => __('label.carousel')
-                    ])
-                ]);
-                DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
+            Carousel::create([
+                'type' => $req->type,
+                'title' => $req->title,
+                'description' => $req->description,
+                'url' => storeImage('url', 'homepage')
+            ]);
+
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.carousel')
+                ])
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
         }
         return $r;
     }
     public function update($id, Request $req){
+        $this->validate($req, [
+            'type' => 'required|numeric|min:1|max:2',
+            'title' => 'required|string',
+            'description' => 'nullable|string',
+            'url' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048000'
+        ]);
+
         try {
             DB::beginTransaction();
 
             if($check = Carousel::find($id)){
-                if($req->url != 'null'){
-                    Storage::disk('public')->delete($check->url);
+                if($req->file('url')){
+                    File::delete(toPath($check->url));
 
-                    // $url = $req->file('url')->store('homepage', 'public');
-                    // imgCompress($url);
                     $url = storeImage('url', 'homepage');
                 }else $url = $check->url;
 
@@ -87,9 +92,7 @@ class CarouselController extends Controller
             DB::beginTransaction();
 
             if($check = Carousel::find($id)){
-                $s = Storage::disk('public');
-
-                $s->delete($check->url);
+                File::delete(toPath($check->url));
 
                 $check->delete();
 

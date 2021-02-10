@@ -184,3 +184,15 @@ function storeImage($name, $path, Request $req){
 
     return $path.'/'.$f['filename'].'.webp';
 }
+
+/**
+ * Convert directory separator
+ * 
+ * @param string $str
+ * @param boolean $bool
+ * 
+ * @return string
+ */
+function toPath($str, $bool = true){
+    return str_replace('/', DIRECTORY_SEPARATOR, ($bool ? public_path('storage') : '').$str);
+}

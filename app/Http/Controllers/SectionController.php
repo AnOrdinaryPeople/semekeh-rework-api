@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SectionRequest;
 use App\Models\Section;
 use Illuminate\Support\Facades\DB;
 
@@ -11,7 +10,12 @@ class SectionController extends Controller
     public function table(){
         return response(Section::orderBy('id')->get());
     }
-    public function update($id, SectionRequest $req){
+    public function update($id, Request $req){
+        $this->validate($req, [
+            'title' => 'required|string',
+            'subtitle' => 'required|string',
+        ]);
+
         try {
             DB::beginTransaction();
 

@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AgendaRequest;
-use App\Http\Requests\GalleryRequest;
 use App\Models\Agenda;
 use App\Models\Gallery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class AgendaController extends Controller
 {
@@ -26,46 +24,52 @@ class AgendaController extends Controller
                 ->get()
         ]);
     }
-    public function create(AgendaRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function create(Request $req){
+        $this->validate($req, [
+            'title' => 'required|string',
+            'time' => 'required|string',
+            'content' => 'required|string',
+            'banner' => 'required|mimes:jpg,jpeg,png,webp|max:2048000'
+        ]);
 
-                $v = Agenda::create([
-                    'title' => $req->title,
-                    'time' => $req->time,
-                    'content' => $req->content,
-                    'slug' => kebabCase(strtotime(now()).' '.$req->title),
-                    // 'banner' => $req->file('banner')->store('agenda', 'public')
-                    'banner' => storeImage('banner', 'agenda')
-                ]);
-                // imgCompress($v->banner);
+        try {
+            DB::beginTransaction();
 
-                $r = response([
-                    'message' => __('label.success.create', [
-                        'data' => __('label.agenda')
-                    ])
-                ]);
-                DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
+            Agenda::create([
+                'title' => $req->title,
+                'time' => $req->time,
+                'content' => $req->content,
+                'slug' => kebabCase(strtotime(now()).' '.$req->title),
+                'banner' => storeImage('banner', 'agenda')
+            ]);
+
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.agenda')
+                ])
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
         }
         return $r;
     }
     public function update($id, Request $req){
+        $this->validate($req, [
+            'title' => 'required|string',
+            'time' => 'required|string',
+            'content' => 'required|string',
+            'banner' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048000'
+        ]);
+
         try {
             DB::beginTransaction();
 
             if($check = Agenda::find($id)){
-                if($req->banner != 'null'){
-                    Storage::disk('public')->delete($check->banner);
+                if($req->file('banner')){
+                    File::delete(toPath($check->banner));
 
-                    // $url = $req->file('banner')->store('agenda', 'public');
-                    // imgCompress($url);
                     $url = storeImage('banner', 'agenda');
                 }else $url = $check->banner;
 
@@ -106,14 +110,13 @@ class AgendaController extends Controller
             DB::beginTransaction();
 
             if($check = Agenda::find($id)){
-                $s = Storage::disk('public');
                 $g = Gallery::whereTarget(3)
                     ->whereType($id);
 
                 foreach ($g->get() as $i)
-                    $s->delete($i->url);
+                    File::delete(toPath($i->url));
 
-                $s->delete($check->banner);
+                File::delete(toPath($check->banner));
 
                 $g->delete();
                 $check->delete();
@@ -138,31 +141,29 @@ class AgendaController extends Controller
         }
         return $r;
     }
-    public function createImg($id, GalleryRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function createImg($id, Request $req){
+        $this->validate($req, [
+            'url' => 'required|mimes:jpg,jpeg,png,webp|max:2048000',
+        ]);
 
-                $a = Gallery::create([
-                    'target' => 3,
-                    'type' => $id,
-                    // 'url' => $req->file('url')->store('agenda', 'public')
-                    'url' => storeImage('url', 'agenda')
-                ]);
-                // imgCompress($a->url);
+        try {
+            DB::beginTransaction();
 
-                $r = response([
-                    'message' => __('label.success.create', [
-                        'data' => __('label.image')
-                    ])
-                ]);
-                DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
+            Gallery::create([
+                'target' => 3,
+                'type' => $id,
+                'url' => storeImage('url', 'agenda')
+            ]);
+
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.image')
+                ])
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
         }
         return $r;
     }
@@ -171,9 +172,7 @@ class AgendaController extends Controller
             DB::beginTransaction();
 
             if($check = Gallery::find($id)){
-                $s = Storage::disk('public');
-
-                $s->delete($check->url);
+                File::delete(toPath($check->url));
 
                 $check->delete();
 

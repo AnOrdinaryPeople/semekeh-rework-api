@@ -2,39 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\GalleryRequest;
 use App\Models\Gallery;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class GalleryController extends Controller
 {
     public function table(){
         return response(Gallery::whereTarget(0)->latest()->get());
     }
-    public function create(GalleryRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function create(Request $req){
+        $this->validate($req, [
+            'url' => 'required|mimes:jpg,jpeg,png,webp|max:2048000',
+        ]);
 
-                $a = Gallery::create([
-                    // 'url' => $req->file('url')->store('gallery', 'public')
-                    'url' => storeImage('url', 'gallery')
-                ]);
-                // imgCompress($a->url);
+        try {
+            DB::beginTransaction();
 
-                $r = response([
-                    'message' => __('label.success.create', [
-                        'data' => __('label.image')
-                    ])
-                ]);
-                DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
+            Gallery::create([
+                'url' => storeImage('url', 'gallery')
+            ]);
+
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.image')
+                ])
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
         }
         return $r;
     }
@@ -43,9 +40,7 @@ class GalleryController extends Controller
             DB::beginTransaction();
 
             if($check = Gallery::find($id)){
-                $s = Storage::disk('public');
-
-                $s->delete($check->url);
+                File::delete(toPath($check->url));
 
                 $check->delete();
 

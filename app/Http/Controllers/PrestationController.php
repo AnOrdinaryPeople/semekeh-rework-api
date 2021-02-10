@@ -2,56 +2,61 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PrestationRequest;
 use App\Models\Prestation as Pres;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class PrestationController extends Controller
 {
     public function table(){
         return response(Pres::latest()->get());
     }
-    public function create(PrestationRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function create(Request $req){
+        $this->validate($req, [
+            'title' => 'required|string',
+            'rank' => 'required|string',
+            'year' => 'required|numeric',
+            'url' => 'required|mimes:jpg,jpeg,png,webp|max:2048000'
+        ]);
 
-                $v = Pres::create([
-                    'title' => $req->title,
-                    'rank' => $req->rank,
-                    'year' => $req->year,
-                    // 'url' => $req->file('url')->store('prestation', 'public')
-                    'url' => storeImage('url', 'prestation')
-                ]);
-                // imgCompress($v->url);
+        try {
+            DB::beginTransaction();
 
-                $r = response([
-                    'message' => __('label.success.create', [
-                        'data' => __('label.prestation')
-                    ])
-                ]);
-                DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
+            Pres::create([
+                'title' => $req->title,
+                'rank' => $req->rank,
+                'year' => $req->year,
+                'url' => storeImage('url', 'prestation')
+            ]);
+
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.prestation')
+                ])
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
         }
         return $r;
     }
     public function update($id, Request $req){
+        $this->validate($req, [
+            'title' => 'required|string',
+            'rank' => 'required|string',
+            'year' => 'required|numeric',
+            'url' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048000'
+        ]);
+
         try {
             DB::beginTransaction();
 
             if($check = Pres::find($id)){
-                if($req->url != 'null'){
-                    Storage::disk('public')->delete($check->url);
+                if($req->file('url')){
+                    File::delete(toPath($check->url));
 
-                    // $url = $req->file('url')->store('prestation', 'public');
-                    // imgCompress($url);
                     $url = storeImage('url', 'prestation');
                 }else $url = $check->url;
 
@@ -87,9 +92,7 @@ class PrestationController extends Controller
             DB::beginTransaction();
 
             if($check = Pres::find($id)){
-                $s = Storage::disk('public');
-
-                $s->delete($check->url);
+                File::delete(toPath($check->url));
 
                 $check->delete();
 

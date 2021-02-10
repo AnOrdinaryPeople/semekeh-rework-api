@@ -44,6 +44,7 @@ $router->group(['prefix' => 'admin', 'middleware' => ['auth']], function() use (
 
     $router->group(['prefix' => 'homepage'], function() use ($router){
     	$router->get('/', 'HomepageController@index');
+    	$router->post('/foundation/{id}', 'KeywordController@update');
 
     	$router->group(['prefix' => 'carousel'], function() use ($router){
     		$router->get('/', 'CarouselController@table');

@@ -2,56 +2,61 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AlumniRequest;
 use App\Models\Alumni;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class AlumniController extends Controller
 {
     public function table(){
         return response(Alumni::latest()->get());
     }
-    public function create(AlumniRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function create(Request $req){
+        $this->validate($req, [
+            'name' => 'required|string',
+            'company' => 'required|string',
+            'content' => 'required|string',
+            'url' => 'required|mimes:jpg,jpeg,png,webp|max:2048000'
+        ]);
 
-                $v = Alumni::create([
-                    'name' => ucfirst($req->name),
-                    'company' => $req->company,
-                    'content' => $req->content,
-                    // 'url' => $req->file('url')->store('homepage', 'public')
-                    'url' => storeImage('url', 'homepage')
-                ]);
-                // imgCompress($v->url);
+        try {
+            DB::beginTransaction();
 
-                $r = response([
-                    'message' => __('label.success.create', [
-                        'data' => __('label.alumni')
-                    ])
-                ]);
-                DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
+            Alumni::create([
+                'name' => ucfirst($req->name),
+                'company' => $req->company,
+                'content' => $req->content,
+                'url' => storeImage('url', 'homepage')
+            ]);
+
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.alumni')
+                ])
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
         }
         return $r;
     }
     public function update($id, Request $req){
+        $this->validate($req, [
+            'name' => 'required|string',
+            'company' => 'required|string',
+            'content' => 'required|string',
+            'url' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048000'
+        ]);
+
         try {
             DB::beginTransaction();
 
             if($check = Alumni::find($id)){
-                if($req->url != 'null'){
-                    Storage::disk('public')->delete($check->url);
+                if($req->file('url')){
+                    File::delete(toPath($check->url));
 
-                    // $url = $req->file('url')->store('homepage', 'public');
-                    // imgCompress($url);
                     $url = storeImage('url', 'homepage');
                 }else $url = $check->url;
 
@@ -87,9 +92,7 @@ class AlumniController extends Controller
             DB::beginTransaction();
 
             if($check = Alumni::find($id)){
-                $s = Storage::disk('public');
-
-                $s->delete($check->url);
+                File::delete(toPath($check->url));
 
                 $check->delete();
 

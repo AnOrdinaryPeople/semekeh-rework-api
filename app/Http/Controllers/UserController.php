@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UserRequest;
-use App\Http\Requests\UserUpdateRequest;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
@@ -21,69 +19,80 @@ class UserController extends Controller
             'role' => Role::latest()->pluck('name', 'id')
         ]);
     }
-    public function create(UserRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function create(Request $req){
+        $this->validate($req, [
+            'name' => 'required|string',
+            'email' => 'required|string|email|unique:users',
+            'password' => 'required|string|confirmed',
+            'role_id' => 'required|numeric'
+        ]);
 
-                User::create([
+        try {
+            DB::beginTransaction();
+
+            User::create([
+                'name' => $req->name,
+                'email' => $req->email,
+                'email_verified_at' => now(),
+                'password' => Hash::make($req->password),
+                'role_id' => $req->role_id
+            ]);
+
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.user')
+                ])
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
+        }
+        return $r;
+    }
+    public function update($id, Request $req){
+        $this->validate($req, [
+            'name' => 'required|string',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                Rule::unique('users', 'email')->ignore($this->route('id'))
+            ],
+            'password' => 'nullable|string|confirmed',
+            'role_id' => 'required|numeric'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            if($check = User::find($id)){
+                $check->update([
                     'name' => $req->name,
                     'email' => $req->email,
-                    'email_verified_at' => now(),
-                    'password' => Hash::make($req->password),
+                    'password' => $req->password
+                        ? Hash::make($req->password)
+                        : $check->password,
                     'role_id' => $req->role_id
                 ]);
 
                 $r = response([
-                    'message' => __('label.success.create', [
+                    'message' => __('label.success.update', [
                         'data' => __('label.user')
                     ])
                 ]);
                 DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
+            }else{
+                $r = response([
+                    'message' => __('label.error.not_found', [
+                        'data' => __('label.user')
+                    ])
+                ], 422);
                 DB::rollback();
             }
-        }
-        return $r;
-    }
-    public function update($id, UserUpdateRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
-
-                if($check = User::find($id)){
-                    $check->update([
-                        'name' => $req->name,
-                        'email' => $req->email,
-                        'password' => $req->password
-                            ? Hash::make($req->password)
-                            : $check->password,
-                        'role_id' => $req->role_id
-                    ]);
-
-                    $r = response([
-                        'message' => __('label.success.update', [
-                            'data' => __('label.user')
-                        ])
-                    ]);
-                    DB::commit();
-                }else{
-                    $r = response([
-                        'message' => __('label.error.not_found', [
-                            'data' => __('label.user')
-                        ])
-                    ], 422);
-                    DB::rollback();
-                }
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
         }
         return $r;
     }

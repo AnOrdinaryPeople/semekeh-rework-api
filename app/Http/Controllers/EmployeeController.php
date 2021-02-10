@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\EmployeeRequest;
-use App\Http\Requests\GalleryRequest;
 use App\Models\Employee;
 use App\Models\Gallery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class EmployeeController extends Controller
 {
@@ -20,47 +18,53 @@ class EmployeeController extends Controller
                 ->get()
         ]);
     }
-    public function create(EmployeeRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function create(Request $req){
+        $this->validate($req, [
+            'title' => 'required|string',
+            'name' => 'required|string',
+            'type' => 'required|numeric|min:1|max:3',
+            'url' => 'required|mimes:jpg,jpeg,png,webp|max:2048000'
+        ]);
 
-                $v = Employee::create([
-                    'name' => $req->name,
-                    'title' => $req->title,
-                    'type' => $req->type,
-                    'child_type' => $req->type == 1 ? 3 : 0,
-                    // 'url' => $req->file('url')->store('employees', 'public')
-                    'url' => storeImage('url', 'employees')
-                ]);
-                // imgCompress($v->url);
+        try {
+            DB::beginTransaction();
 
-                $r = response([
-                    'message' => __('label.success.create', [
-                        'data' => __('label.employee')
-                    ])
-                ]);
-                DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
+            Employee::create([
+                'name' => $req->name,
+                'title' => $req->title,
+                'type' => $req->type,
+                'child_type' => $req->type == 1 ? 3 : 0,
+                'url' => storeImage('url', 'employees')
+            ]);
+
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.employee')
+                ])
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
         }
         return $r;
     }
     public function update($id, Request $req){
+        $this->validate($req, [
+            'title' => 'required|string',
+            'name' => 'required|string',
+            'type' => 'required|numeric|min:1|max:3',
+            'url' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048000'
+        ]);
+
         try {
             DB::beginTransaction();
 
             if($check = Employee::find($id)){
-                if($req->url != 'null'){
+                if($req->file('url')){
                     if($check->url !== 'user.png')
-                        Storage::disk('public')->delete($check->url);
+                        File::delete(toPath($check->url));
 
-                    // $url = $req->file('url')->store('employees', 'public');
-                    // imgCompress($url);
                     $url = storeImage('url', 'employees');
                 }else $url = $check->url;
 
@@ -96,10 +100,8 @@ class EmployeeController extends Controller
             DB::beginTransaction();
 
             if($check = Employee::find($id)){
-                $s = Storage::disk('public');
-
                 if($check->url !== 'user.png')
-                    $s->delete($check->url);
+                    File::delete(toPath($check->url));
 
                 $check->delete();
 
@@ -123,29 +125,28 @@ class EmployeeController extends Controller
         }
         return $r;
     }
-    public function createImg(GalleryRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function createImg(Request $req){
+        $this->validate($req, [
+            'url' => 'required|mimes:jpg,jpeg,png,webp|max:2048000',
+        ]);
 
-                $a = Gallery::create([
-                    'target' => 4,
-                    'url' => $req->file('url')->store('agenda', 'public')
-                ]);
-                imgCompress($a->url);
+        try {
+            DB::beginTransaction();
 
-                $r = response([
-                    'message' => __('label.success.create', [
-                        'data' => __('label.image')
-                    ])
-                ]);
-                DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
+            Gallery::create([
+                'target' => 4,
+                'url' => storeImage('url', 'employees'),
+            ]);
+
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.image')
+                ])
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            $r = response(['message' => __('auth.server_error')], 500);
+            DB::rollback();
         }
         return $r;
     }
@@ -154,9 +155,7 @@ class EmployeeController extends Controller
             DB::beginTransaction();
 
             if($check = Gallery::find($id)){
-                $s = Storage::disk('public');
-
-                $s->delete($check->url);
+                File::delete(toPath($check->url));
 
                 $check->delete();
 

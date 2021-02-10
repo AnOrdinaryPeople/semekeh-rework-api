@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\About;
 use App\Models\Audit;
 use App\Models\Carousel;
+use App\Models\Keyword;
 use App\Models\Section;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class HomepageController extends Controller
 {
@@ -16,7 +17,8 @@ class HomepageController extends Controller
         return response([
             'carousel' => Carousel::latest()->get(),
             'about' => About::find(1),
-            'section' => Section::orderBy('id')->get()
+            'section' => Section::orderBy('id')->get(),
+            'foundation' => Keyword::oldest('id')->first()->value
         ]);
     }
     public function aboutUpdate(Request $req){
@@ -26,10 +28,8 @@ class HomepageController extends Controller
             $a = About::find(1);
 
             if($req->url != 'null'){
-                Storage::disk('public')->delete($a->url);
+                File::delete(toPath($a->url));
 
-                // $img = $req->file('url')->store('homepage', 'public');
-                // imgCompress($img);
                 $img = storeImage('url', 'homepage');
             }else $img = $a->url;
 

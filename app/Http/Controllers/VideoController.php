@@ -2,82 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\VideoRequest;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class VideoController extends Controller
 {
     public function table(){
         return response(Video::latest()->get());
     }
-    public function create(VideoRequest $req){
-        if($req->val && $req->val->fails())
-            $r = response($req->val->errors(), 422);
-        else{
-            try {
-                DB::beginTransaction();
+    public function create(Request $req){
+        $this->validate($req, [
+            'thumbnail' => 'required|mimes:jpg,jpeg,png,webp|max:2048000',
+            'video' => 'required|string'
+        ]);
 
-                $v = Video::create([
-                    // 'thumbnail' => $req->file('thumbnail')->store('homepage', 'public'),
-                    'thumbnail' => storeImage('thumbnail', 'homepage'),
-                    'video' => $req->video
-                ]);
-                // imgCompress($v->thumbnail);
-
-                $r = response([
-                    'message' => __('label.success.create', [
-                        'data' => __('label.video')
-                    ])
-                ]);
-                DB::commit();
-            } catch (Exception $e) {
-                $r = response(['message' => __('auth.server_error')], 500);
-                DB::rollback();
-            }
-        }
-        return $r;
-    }
-    public function update($id, Request $req){
         try {
             DB::beginTransaction();
 
-            if($check = Video::find($id)){
-                if($req->thumbnail != 'null'){
-                    Storage::disk('public')->delete($check->thumbnail);
+            Video::create([
+                'thumbnail' => storeImage('thumbnail', 'homepage'),
+                'video' => $req->video
+            ]);
 
-                    // $thumb = $req->file('thumbnail')->store('homepage', 'public');
-                    // imgCompress($thumb);
-                    $thumb = storeImage('thumbnail', 'homepage');
-                }else $thumb = $check->thumbnail;
-
-                if($req->video != 'null'){
-                    Storage::disk('public')->delete($check->video);
-
-                    $video = $req->file('video')->store('homepage', 'public');
-                }else $video = $check->video;
-
-                $check->update([
-                    'thumbnail' => $thumb,
-                    'video' => $video
-                ]);
-
-                $r = response([
-                    'message' => __('label.success.update', [
-                        'data' => __('label.video')
-                    ])
-                ]);
-                DB::commit();
-            }else{
-                $r = response([
-                    'message' => __('label.error.not_found', [
-                        'data' => __('label.video')
-                    ])
-                ], 422);
-                DB::rollback();
-            }
+            $r = response([
+                'message' => __('label.success.create', [
+                    'data' => __('label.video')
+                ])
+            ]);
+            DB::commit();
         } catch (Exception $e) {
             $r = response(['message' => __('auth.server_error')], 500);
             DB::rollback();
@@ -89,10 +43,8 @@ class VideoController extends Controller
             DB::beginTransaction();
 
             if($check = Video::find($id)){
-                $s = Storage::disk('public');
-
-                $s->delete($check->thumbnail);
-                $s->delete($check->video);
+                File::delete(toPath($check->thumbnail));
+                File::delete(toPath($check->video));
 
                 $check->delete();
 
