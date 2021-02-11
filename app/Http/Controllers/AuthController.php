@@ -52,7 +52,7 @@ class AuthController extends Controller
         return response()->json(app('auth')->user());
     }
 
-    public function update($id, Request $req){
+    public function update(Request $req){
         $this->validate($req, [
             'name' => 'required|string',
             'pass' => 'required|string',
@@ -62,7 +62,7 @@ class AuthController extends Controller
         try {
             DB::beginTransaction();
 
-            if($check = User::find($id)){
+            if($check = User::find(app('auth')->user()->id)){
                 if(Hash::check($req->pass, $check->password)){
                     $check->update([
                         'name' => $req->name,
