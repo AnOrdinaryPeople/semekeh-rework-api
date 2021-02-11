@@ -97,4 +97,13 @@ $router->group(['prefix' => 'admin', 'middleware' => ['auth']], function() use (
     		$router->post('update/{id}', 'SectionController@update');
     	});
     });
+
+    $router->group(['prefix' => 'profile'], function() use ($router){
+        $router->get('{id}', 'ProfileController@getData');
+        $router->get('council/get', 'ProfileController@council');
+        $router->post('council/update', 'ProfileController@updateCouncil');
+        $router->post('update/{id}', 'ProfileController@update');
+        $router->post('img/create/{id}', 'ProfileController@createImg');
+        $router->delete('img/delete/{id}', 'ProfileController@deleteImg');
+    });
 });
