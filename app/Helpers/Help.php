@@ -54,10 +54,7 @@ function asset($path, $secured = false) {
 }
 
 /**
- * This will be return storage path.
- * 
- * This function should be working
- * if you had run this command:
+ * Storage path.
  * 
  * php artisan storage:link
  * 
@@ -114,8 +111,8 @@ function imgCompress($path){
         foreach($path as $p)
             imgCompress($p);
     }else{
-        $a = pathinfo($path);
         $p = $path;
+        $a = pathinfo($p);
 
         switch ($a['extension']) {
             case 'jpeg':

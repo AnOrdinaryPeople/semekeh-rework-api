@@ -107,4 +107,76 @@ $router->group(['prefix' => 'admin', 'middleware' => ['auth']], function() use (
         $router->post('img/create/{id}', 'ProfileController@createImg');
         $router->delete('img/delete/{id}', 'ProfileController@deleteImg');
     });
+
+    $router->group(['prefix' => 'study-program'], function() use ($router){
+        $router->get('/', 'StudyController@table');
+        $router->get('edit/{id}', 'StudyController@edit');
+        $router->post('update/{id}', 'StudyController@update');
+    });
+
+	$router->group(['prefix' => 'media'], function() use ($router){
+        $router->group(['prefix' => 'agenda'], function() use ($router){
+            $router->get('/', 'AgendaController@table');
+            $router->post('create', 'AgendaController@create');
+            $router->post('update/{id}', 'AgendaController@update');
+            $router->get('edit/{id}', 'AgendaController@edit');
+            $router->delete('delete/{id}', 'AgendaController@delete');
+            $router->post('img/create/{id}', 'AgendaController@createImg');
+            $router->delete('img/delete/{id}', 'AgendaController@deleteImg');
+        });
+
+        $router->group(['prefix' => 'prestation'], function() use ($router){
+            $router->get('/', 'PrestationController@table');
+            $router->post('create', 'PrestationController@create');
+            $router->post('update/{id}', 'PrestationController@update');
+            $router->delete('delete/{id}', 'PrestationController@delete');
+        });
+
+        $router->group(['prefix' => 'gallery'], function() use ($router){
+            $router->get('/', 'GalleryController@table');
+            $router->post('create', 'GalleryController@create');
+            $router->delete('delete/{id}', 'GalleryController@delete');
+        });
+    });
+
+	$router->group(['prefix' => 'employee'], function() use ($router){
+        $router->get('/', 'EmployeeController@table');
+        $router->post('create', 'EmployeeController@create');
+        $router->post('update/{id}', 'EmployeeController@update');
+        $router->delete('delete/{id}', 'EmployeeController@delete');
+        $router->post('img/create', 'EmployeeController@createImg');
+        $router->delete('img/delete/{id}', 'EmployeeController@deleteImg');
+    });
+
+	// $router->group(['prefix' => 'keyword'], function() use ($router){
+    //     $router->get('/', 'KeywordController@table');
+    //     $router->post('create', 'KeywordController@create');
+    //     $router->post('update/{id}', 'KeywordController@update');
+    //     $router->delete('delete/{id}', 'KeywordController@delete');
+    // });
+
+    // $router->group(['prefix' => 'meta'], function() use ($router){
+    //     $router->get('/', 'MetaController@table');
+    //     $router->post('create', 'MetaController@create');
+    //     $router->post('update/{id}', 'MetaController@update');
+    //     $router->delete('delete/{id}', 'MetaController@delete');
+    // });
+
+    $router->group(['prefix' => 'user'], function() use ($router){
+        $router->get('/', 'UserController@table');
+        $router->post('create', 'UserController@create');
+        $router->post('update/{id}', 'UserController@update');
+        $router->post('ban/{id}', 'UserController@ban');
+    });
+
+    $router->group(['prefix' => 'role'], function() use ($router){
+        $router->get('/', 'RoleController@table');
+        $router->get('create', 'RoleController@create');
+        $router->get('edit/{id}', 'RoleController@edit');
+        $router->post('store', 'RoleController@store');
+        $router->post('update/{id}', 'RoleController@update');
+        $router->delete('delete/{id}', 'RoleController@delete');
+    });
+
+    $router->get('audit', 'HomepageController@audit');
 });
