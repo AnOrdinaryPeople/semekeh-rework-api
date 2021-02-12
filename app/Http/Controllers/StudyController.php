@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Study;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Validation\Rule;
 
 class StudyController extends Controller
 {
@@ -18,11 +18,7 @@ class StudyController extends Controller
     public function update($id, Request $req){
         $this->validate($req, [
             'banner' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048000',
-            'title' => [
-                'required',
-                'string',
-                Rule::unique('studies', 'title')->ignore($this->route('id'))
-            ],
+            'title' => 'required|string|unique:studies,title,'.$id,
             'content' => 'required|string',
             'title_2' => 'required|string',
             'content_2' => 'required|string',
@@ -55,7 +51,7 @@ class StudyController extends Controller
 
                 $check->update([
                     'banner' => $url,
-                    'name' => $req->title,
+                    'title' => $req->title,
                     'content' => $req->content,
                     'content_2' => json_encode($content),
                     'slug' => kebabCase($req->title)

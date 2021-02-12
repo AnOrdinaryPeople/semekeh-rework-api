@@ -93,6 +93,8 @@ class PermissionSeeder extends Seeder
             // 'meta-tags.create',
             // 'meta-tags.update',
             // 'meta-tags.delete',
+            'settings.show',
+            'settings.update',
             'audits.show',
         ];
         $r = new \App\Models\Role;

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Social;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SocialController extends Controller
