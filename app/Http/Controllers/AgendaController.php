@@ -35,7 +35,7 @@ class AgendaController extends Controller
         try {
             DB::beginTransaction();
 
-            Agenda::create([
+            $a = Agenda::create([
                 'title' => $req->title,
                 'time' => $req->time,
                 'content' => $req->content,
@@ -46,7 +46,8 @@ class AgendaController extends Controller
             $r = response([
                 'message' => __('label.success.create', [
                     'data' => __('label.agenda')
-                ])
+                ]),
+                'slug' => $a->slug
             ]);
             DB::commit();
         } catch (Exception $e) {

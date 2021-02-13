@@ -60,6 +60,8 @@ $app->singleton(
 */
 
 $app->configure('app');
+$app->configure('audit');
+$app->configure('jwt');
 
 config([
     'app_name' => env('APP_NAME', 'SMK BPI'),
@@ -120,7 +122,5 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/web.php';
 });
-
-$app->configure('audit');
 
 return $app;
