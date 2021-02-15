@@ -12,7 +12,7 @@ class CacheCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'cache:refresh';
+    protected $signature = 'cache:refresh {timer=month}';
 
     /**
      * The console command description.
@@ -38,23 +38,25 @@ class CacheCommand extends Command
      */
     public function handle()
     {
+        $timer = timer($this->argument('timer'));
+
         $this->line('Refreshing the database cache..');
 
         Cache::flush();
 
-        Cache::put('meta', [
-            'data' => \App\Models\Meta::orderBy('id')->get(['type', 'key', 'value'])
-        ], timer('month'));
+        // Cache::put('meta', [
+        //     'data' => \App\Models\Meta::orderBy('id')->get(['type', 'key', 'value'])
+        // ], $timer);
 
         Cache::put('navbar', [
             'bpi' => \App\Models\Keyword::find(1)->value,
             'study' => \App\Models\Study::orderBy('title')->get(['title', 'slug'])
-        ], timer('month'));
+        ], $timer);
 
         Cache::put('footer', [
             'agenda' => \App\Models\Agenda::latest()->first(['banner', 'title', 'time', 'slug']),
             'footer' => \App\Models\Footer::latest()->get(['key', 'value'])
-        ], timer('day'));
+        ], $timer);
 
         Cache::put('home', [
             'carousel' => \App\Models\Carousel::oldest()->get(['description', 'title', 'type', 'url']),
@@ -67,7 +69,7 @@ class CacheCommand extends Command
             'agenda' => \App\Models\Agenda::latest()->first(['banner', 'content', 'slug', 'time', 'title'])
         ], timer());
 
-        Cache::put('social', \App\Models\Social::latest()->get(['icon', 'link']), timer('month'));
+        Cache::put('social', \App\Models\Social::latest()->get(['icon', 'link']), $timer);
 
         foreach(\App\Models\Profile::all() as $p){
             $obj = [
@@ -81,27 +83,27 @@ class CacheCommand extends Command
             if($p->id === 3)
                 $obj['council'] = \App\Models\Council::whereId(1)->first(['title', 'json']);
 
-            Cache::put('profile'.$p->id, $obj, timer('week'));
+            Cache::put('profile'.$p->id, $obj, $timer);
         }
 
         foreach(\App\Models\Study::all() as $p)
-            Cache::put('study'.str_replace('-', '', $p->slug), $p, timer('week'));
+            Cache::put('study'.str_replace('-', '', $p->slug), $p, $timer);
 
-        Cache::put('agenda', \App\Models\Agenda::latest()->get(['slug', 'title', 'time', 'content', 'banner']), timer('week'));
+        Cache::put('agenda', \App\Models\Agenda::latest()->get(['slug', 'title', 'time', 'content', 'banner']), $timer);
 
-        Cache::put('prestation', \App\Models\Prestation::latest()->get(['title', 'rank', 'year', 'url']), timer('week'));
+        Cache::put('prestation', \App\Models\Prestation::latest()->get(['title', 'rank', 'year', 'url']), $timer);
 
         Cache::put('gallery', [
             'img' => \App\Models\Gallery::latest('id')->get('url'),
             'video' => \App\Models\Video::latest()->get(['thumbnail', 'video'])
-        ], timer('week'));
+        ], $timer);
 
         Cache::put('employee', [
             'employee' => \App\Models\Employee::latest()->get(['title', 'name', 'url', 'type', 'child_type']),
             'img' => \App\Models\Gallery::whereTarget(4)
                 ->latest()
                 ->get('url')
-        ], timer('week'));
+        ], $timer);
 
         $this->info('Database cache has been refreshed!');
 

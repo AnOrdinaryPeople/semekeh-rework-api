@@ -58,7 +58,7 @@ class WelcomeController extends Controller
                 'footer' => Footer::latest()->get(['key', 'value'])
             ];
 
-            Cache::put('footer', $data, timer('day'));
+            Cache::put('footer', $data, timer('month'));
         }
         return response($data);
     }
@@ -77,7 +77,7 @@ class WelcomeController extends Controller
                 'agenda' => Agenda::latest()->first(['banner', 'content', 'slug', 'time', 'title'])
             ];
 
-            Cache::put('home', $data, timer());
+            Cache::put('home', $data, timer('month'));
         }
 
         return response($data);
@@ -88,7 +88,7 @@ class WelcomeController extends Controller
         else{
             $data = Keyword::get(['key', 'value']);
 
-            Cache::put('keyword', $data, timer());
+            Cache::put('keyword', $data, timer('month'));
         }
 
         return response($data);
@@ -122,7 +122,7 @@ class WelcomeController extends Controller
 
                 $r = $obj;
  
-                Cache::put('profile'.$id, $r, timer('week'));
+                Cache::put('profile'.$id, $r, timer('month'));
             }else
                 $r = ['content' => null, 'img' => []];
         }
@@ -138,7 +138,7 @@ class WelcomeController extends Controller
             if($check = Study::whereSlug($id)->first(['banner', 'title', 'content', 'content_2', 'slug'])){
                 $r = $check;
 
-                Cache::put('study'.$str, $r, timer('week'));
+                Cache::put('study'.$str, $r, timer('month'));
             }else $r = null;
         }
 
@@ -150,7 +150,7 @@ class WelcomeController extends Controller
         else{
             $data = Agenda::latest()->get(['slug', 'title', 'time', 'content', 'banner']);
 
-            Cache::put('agenda', $data, timer('week'));
+            Cache::put('agenda', $data, timer('month'));
         }
 
         return response($data);
@@ -174,7 +174,7 @@ class WelcomeController extends Controller
                         ->get(['title', 'time', 'banner', 'slug'])
                 ];
 
-                Cache::put('agenda'.$str, $r, timer('week'));
+                Cache::put('agenda'.$str, $r, timer('month'));
             }else $r = null;
         }
 
@@ -186,7 +186,7 @@ class WelcomeController extends Controller
         else{
             $data = Prestation::latest()->get(['title', 'rank', 'year', 'url']);
 
-            Cache::put('prestation', $data, timer('week'));
+            Cache::put('prestation', $data, timer('month'));
         }
 
         return response($data);
@@ -200,7 +200,7 @@ class WelcomeController extends Controller
                 'video' => Video::latest()->get(['thumbnail', 'video'])
             ];
 
-            Cache::put('gallery', $data, timer('week'));
+            Cache::put('gallery', $data, timer('month'));
         }
 
         return response($data);
@@ -216,7 +216,7 @@ class WelcomeController extends Controller
                     ->get('url')
             ];
 
-            Cache::put('employee', $data, timer('week'));
+            Cache::put('employee', $data, timer('month'));
         }
 
         return response($data);

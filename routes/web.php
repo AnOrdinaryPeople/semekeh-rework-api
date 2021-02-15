@@ -45,7 +45,6 @@ $router->group(['prefix' => 'admin', 'middleware' => ['auth']], function() use (
 
     $router->group(['prefix' => 'homepage'], function() use ($router){
     	$router->get('/', 'HomepageController@index');
-    	$router->post('/foundation/{id}', 'KeywordController@update');
 
     	$router->group(['prefix' => 'carousel'], function() use ($router){
     		$router->get('/', 'CarouselController@table');
@@ -176,6 +175,12 @@ $router->group(['prefix' => 'admin', 'middleware' => ['auth']], function() use (
         $router->post('store', 'RoleController@store');
         $router->post('update/{id}', 'RoleController@update');
         $router->delete('delete/{id}', 'RoleController@delete');
+    });
+
+    $router->group(['prefix' => 'settings'], function() use ($router){
+        $router->get('/', 'SettingController@index');
+        $router->post('/foundation/{id}', 'SettingController@foundation');
+        $router->post('/cache', 'SettingController@cache');
     });
 
     $router->get('audit', 'HomepageController@audit');
