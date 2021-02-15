@@ -53,12 +53,7 @@ class UserController extends Controller
     public function update($id, Request $req){
         $this->validate($req, [
             'name' => 'required|string',
-            'email' => [
-                'required',
-                'string',
-                'email',
-                Rule::unique('users', 'email')->ignore($this->route('id'))
-            ],
+            'email' => 'required|string|email|unique:users,email,'.$id,
             'password' => 'nullable|string|confirmed',
             'role_id' => 'required|numeric'
         ]);
