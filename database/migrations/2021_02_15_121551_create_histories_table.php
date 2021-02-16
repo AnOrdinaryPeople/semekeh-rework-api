@@ -16,6 +16,8 @@ class CreateHistoriesTable extends Migration
         Schema::create('histories', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->references('id')->on('users');
+            $table->string('duration');
+            $table->timestamp('expire');
             $table->timestamps();
         });
     }

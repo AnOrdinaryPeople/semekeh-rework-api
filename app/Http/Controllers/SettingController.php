@@ -52,11 +52,36 @@ class SettingController extends Controller
         return $r;
     }
     public function cache(Request $req){
+        $timer = @$req->timer ?? 'month';
+
+        switch ($timer) {
+            case 'year':
+                $str = '1 year';
+                break;
+            case 'month':
+                $str = '1 month';
+                break;
+            case 'week':
+                $str = '1 week';
+                break;
+            case 'day':
+                $str = '1 day';
+                break;
+
+            default:
+                $str = '3 days';
+                break;
+        }
+
         Artisan::call('cache:refresh', [
-            'timer' => @$req->timer ?? 'month'
+            'timer' => $timer
         ]);
 
-        History::create(['user_id' => app('auth')->user()->id]);
+        History::create([
+            'user_id' => app('auth')->user()->id,
+            'duration' => $str,
+            'expire' => date('Y-m-d H:i:s', strtotime('+'.$str, strtotime(now())))
+        ]);
 
         return response([
             'message' => 'Database cache has been created.',

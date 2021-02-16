@@ -6,21 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class History extends Model
 {
-    protected $fillable = ['user_id'];
-
-    public static function getLatest(){
-    	return self::latest()
-    		->join('users', 'users.id', '=', 'user_id')
-    		->first(['name', 'histories.created_at']);
-    }
+    protected $fillable = ['user_id', 'duration', 'expire'];
 
     public static function getAll(){
     	return self::latest()
     		->join('users', 'users.id', '=', 'user_id')
-    		->get(['name', 'histories.created_at'])
-    		->map(function($data){
+    		->get(['name', 'duration', 'expire', 'histories.created_at'])
+    		->map(function($data, $key){
     			return [
+                    'key' => $key,
     				'name' => $data->name,
+    				'duration' => $data->duration,
+    				'expire' => date('Y M d H:i', strtotime($data->expire)),
     				'created_at' => date('Y M d H:i:s', strtotime($data->created_at))
     			];
     		});
