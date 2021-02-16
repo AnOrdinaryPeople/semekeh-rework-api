@@ -17,7 +17,7 @@ class History extends Model
                     'key' => $key,
     				'name' => $data->name,
     				'duration' => $data->duration,
-    				'expire' => date('Y M d H:i', strtotime($data->expire)),
+    				'expire' => date('l, Y M d, H:i', strtotime($data->expire)),
     				'created_at' => date('Y M d H:i:s', strtotime($data->created_at))
     			];
     		});
