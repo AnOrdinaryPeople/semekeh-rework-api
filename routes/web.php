@@ -27,6 +27,8 @@ $router->get('profile/{id}', 'WelcomeController@profile');
 $router->get('study/{id}', 'WelcomeController@study');
 $router->get('agenda', 'WelcomeController@agenda');
 $router->get('agenda/{id}', 'WelcomeController@agendaDetail');
+$router->get('news', 'WelcomeController@news');
+$router->get('news/{id}', 'WelcomeController@newsDetail');
 $router->get('prestation', 'WelcomeController@prestation');
 $router->get('gallery', 'WelcomeController@gallery');
 $router->get('employee', 'WelcomeController@employee');
@@ -122,6 +124,14 @@ $router->group(['prefix' => 'admin', 'middleware' => ['auth']], function() use (
             $router->delete('delete/{id}', 'AgendaController@delete');
             $router->post('img/create/{id}', 'AgendaController@createImg');
             $router->delete('img/delete/{id}', 'AgendaController@deleteImg');
+        });
+
+        $router->group(['prefix' => 'news'], function() use ($router){
+            $router->get('/', 'NewsController@table');
+            $router->post('create', 'NewsController@create');
+            $router->get('edit/{id}', 'NewsController@edit');
+            $router->post('update/{id}', 'NewsController@update');
+            $router->delete('delete/{id}', 'NewsController@delete');
         });
 
         $router->group(['prefix' => 'prestation'], function() use ($router){

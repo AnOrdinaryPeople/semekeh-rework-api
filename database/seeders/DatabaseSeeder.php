@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AgendaSeeder::class);
         $this->call(PrestationSeeder::class);
         $this->call(EmployeeSeeder::class);
+        $this->call(NewsSeeder::class);
         // $this->call(MetaSeeder::class);
     }
 }

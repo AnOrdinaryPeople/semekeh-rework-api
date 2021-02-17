@@ -12,7 +12,8 @@ use App\Models\Employee;
 use App\Models\Footer;
 use App\Models\Gallery;
 use App\Models\Keyword;
-use App\Models\Meta;
+// use App\Models\Meta;
+use App\Models\News;
 use App\Models\Prestation;
 use App\Models\Profile;
 use App\Models\Section;
@@ -24,17 +25,17 @@ use Illuminate\Support\Facades\Cache;
 
 class WelcomeController extends Controller
 {
-    public function meta(){
-        if($c = Cache::get('meta'))
-            $data = $c;
-        else{
-            $data = ['data' => Meta::orderBy('id')->get(['type', 'key', 'value'])];
+    // public function meta(){
+    //     if($c = Cache::get('meta'))
+    //         $data = $c;
+    //     else{
+    //         $data = ['data' => Meta::orderBy('id')->get(['type', 'key', 'value'])];
 
-            Cache::put('meta', $data, timer('month'));
-        }
+    //         Cache::put('meta', $data, timer('month'));
+    //     }
 
-    	return response($data);
-    }
+    // 	return response($data);
+    // }
     public function navbar(){
         if($c = Cache::get('navbar'))
             $data = $c;
@@ -74,7 +75,8 @@ class WelcomeController extends Controller
                 'company' => Company::latest()->get(['link', 'url']),
                 'section' => Section::orderBy('id')->get(['title', 'subtitle']),
                 'prestation' => Prestation::latest()->limit(3)->get(['rank', 'title', 'url', 'year']),
-                'agenda' => Agenda::latest()->first(['banner', 'content', 'slug', 'time', 'title'])
+                'agenda' => Agenda::latest()->first(['banner', 'content', 'slug', 'time', 'title']),
+                'news' => News::latest()->limit(3)->get(['title', 'banner', 'slug'])
             ];
 
             Cache::put('home', $data, timer('month'));
@@ -180,6 +182,38 @@ class WelcomeController extends Controller
 
         return response($r);
     }
+    public function news(){
+        if($c = Cache::get('news'))
+            $data = $c;
+        else{
+            $data = News::latest()->get(['slug', 'title', 'banner']);
+
+            Cache::put('news', $data, timer('month'));
+        }
+
+        return response($data);
+    }
+    public function newsDetail($id){
+        $str = str_replace('-', '', $id);
+
+        if($c = Cache::get('news'.$str))
+            $r = $c;
+        else{
+            if($a = News::whereSlug($id)->first()){
+                $r = [
+                    'news' => $a->only(['slug', 'title', 'content', 'banner']),
+                    'other' => News::where('id', '!=', $a->id)
+                        ->inRandomOrder()
+                        ->limit(3)
+                        ->get(['title', 'banner', 'slug'])
+                ];
+
+                Cache::put('news'.$str, $r, timer('month'));
+            }else $r = null;
+        }
+
+        return response($r);
+    }
     public function prestation(){
         if($c = Cache::get('prestation'))
             $data = $c;
@@ -224,10 +258,8 @@ class WelcomeController extends Controller
     public function search(){
         return response([
             'agenda' => Agenda::search(request()->q),
-            'pres' => Prestation::search(request()->q)
+            'pres' => Prestation::search(request()->q),
+            'news' => News::search(request()->q)
         ]);
     }
-    // public function viewFile($path){
-    //     return response()->file($path);
-    // }
 }

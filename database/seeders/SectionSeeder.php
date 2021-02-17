@@ -47,7 +47,12 @@ class SectionSeeder extends Seeder
                 'subtitle' => 'Kita bekerja sama dan mitra dengan Perusahaan',
                 'created_at' => $t,
                 'updated_at' => $t
-            ],
+            ], [
+                'title' => 'Berita',
+                'subtitle' => 'Berita terkini dari SMK BPI',
+                'created_at' => $t,
+                'updated_at' => $t
+            ]
         ]);
     }
 }

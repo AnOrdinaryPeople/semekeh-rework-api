@@ -84,7 +84,9 @@ class SettingController extends Controller
         ]);
 
         return response([
-            'message' => 'Database cache has been created.',
+            'message' => __('label.success.create', [
+                'data' => __('db_cache')
+            ]),
             'table' => History::getAll()
         ]);
     }

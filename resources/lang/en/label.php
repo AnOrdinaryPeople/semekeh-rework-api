@@ -23,6 +23,8 @@ return [
     'role' => 'Role',
     'active' => 'Actived',
     'inactive' => 'Inactivated',
+    'db_cache' => 'Database cache',
+    'news' => 'News',
     'success' => [
         'create' => ':data has been created.',
         'update' => ':data has been updated.',

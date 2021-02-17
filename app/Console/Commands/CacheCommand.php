@@ -66,7 +66,8 @@ class CacheCommand extends Command
             'company' => \App\Models\Company::latest()->get(['link', 'url']),
             'section' => \App\Models\Section::orderBy('id')->get(['title', 'subtitle']),
             'prestation' => \App\Models\Prestation::latest()->limit(3)->get(['rank', 'title', 'url', 'year']),
-            'agenda' => \App\Models\Agenda::latest()->first(['banner', 'content', 'slug', 'time', 'title'])
+            'agenda' => \App\Models\Agenda::latest()->first(['banner', 'content', 'slug', 'time', 'title']),
+            'news' => News::latest()->limit(3)->get(['title', 'banner', 'slug'])
         ], timer());
 
         Cache::put('social', \App\Models\Social::latest()->get(['icon', 'link']), $timer);
@@ -90,6 +91,8 @@ class CacheCommand extends Command
             Cache::put('study'.str_replace('-', '', $p->slug), $p, $timer);
 
         Cache::put('agenda', \App\Models\Agenda::latest()->get(['slug', 'title', 'time', 'content', 'banner']), $timer);
+
+        Cache::put('news', \App\Models\News::latest()->get(['slug', 'title', 'content', 'banner']), $timer);
 
         Cache::put('prestation', \App\Models\Prestation::latest()->get(['title', 'rank', 'year', 'url']), $timer);
 
