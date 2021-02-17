@@ -76,7 +76,7 @@ class WelcomeController extends Controller
                 'section' => Section::orderBy('id')->get(['title', 'subtitle']),
                 'prestation' => Prestation::latest()->limit(3)->get(['rank', 'title', 'url', 'year']),
                 'agenda' => Agenda::latest()->first(['banner', 'content', 'slug', 'time', 'title']),
-                'news' => News::latest()->limit(3)->get(['title', 'banner', 'slug'])
+                'news' => News::latest()->limit(3)->get(['title', 'banner', 'slug', 'created_at'])
             ];
 
             Cache::put('home', $data, timer('month'));
@@ -186,7 +186,7 @@ class WelcomeController extends Controller
         if($c = Cache::get('news'))
             $data = $c;
         else{
-            $data = News::latest()->get(['slug', 'title', 'banner']);
+            $data = News::latest()->get(['slug', 'title', 'banner', 'created_at']);
 
             Cache::put('news', $data, timer('month'));
         }
@@ -201,11 +201,11 @@ class WelcomeController extends Controller
         else{
             if($a = News::whereSlug($id)->first()){
                 $r = [
-                    'news' => $a->only(['slug', 'title', 'content', 'banner']),
+                    'news' => $a->only(['slug', 'title', 'content', 'banner', 'created_at']),
                     'other' => News::where('id', '!=', $a->id)
                         ->inRandomOrder()
                         ->limit(3)
-                        ->get(['title', 'banner', 'slug'])
+                        ->get(['title', 'banner', 'slug', 'created_at'])
                 ];
 
                 Cache::put('news'.$str, $r, timer('month'));
