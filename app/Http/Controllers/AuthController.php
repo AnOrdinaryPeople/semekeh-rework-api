@@ -22,11 +22,13 @@ class AuthController extends Controller
             'recaptcha' => ['required', new Recaptcha]
         ]);
 
-        if(User::whereEmail($req->email)->first()->is_active){
-            if($token = app('auth')->attempt($req->only('email', 'password')))
-                return response()->json(compact('token'));
-            else
-                return response(['message' => __('auth.failed')], 401);
+        if($u = User::whereEmail($req->email)->first()){
+            if($u->is_active){
+                if($token = app('auth')->attempt($req->only('email', 'password')))
+                    return response()->json(compact('token'));
+                else
+                    return response(['message' => __('auth.failed')], 401);
+            }else return response(['message' => __('auth.failed')], 401);
         }else return response(['message' => __('auth.failed')], 401);
     }
 
