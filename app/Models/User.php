@@ -47,11 +47,12 @@ class User extends Model implements Auditable, JWTSubject, AuthenticatableContra
         'email_verified_at' => 'datetime',
     ];
 
-    // public function getUser($id){
-    //     return $this->join('roles', 'roles.id', '=', 'role_id')
-    //         ->where('users.id', $id)
-    //         ->first(['users.id', 'users.name', 'email', 'roles.name as role']);
-    // }
+    public static function getUser($id){
+        return [
+            'role' => Role::find($id)->name,
+            'access' => Permission::getAccess($id)
+        ];
+    }
 
     public function getJWTIdentifier(){
         return $this->getKey();
@@ -60,8 +61,8 @@ class User extends Model implements Auditable, JWTSubject, AuthenticatableContra
     public function getJWTCustomClaims()
     {
         return [
-            'role' => Role::find($this->role_id)->name,
-            'access' => Permission::getAccess($this->role_id)
+            // 'role' => Role::find($this->role_id)->name,
+            // 'access' => Permission::getAccess($this->role_id)
         ];
     }
 }
