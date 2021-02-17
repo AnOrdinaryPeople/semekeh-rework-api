@@ -24,7 +24,7 @@ class AuthController extends Controller
 
         if($u = User::whereEmail($req->email)->first()){
             if($u->is_active){
-                if($token = app('auth')->claims(User::getUser($u->role_id))->attempt($req->only('email', 'password')))
+                if($token = app('auth')->attempt($req->only('email', 'password')))
                     return response()->json(compact('token'));
                 else
                     return response(['message' => __('auth.failed')], 401);
