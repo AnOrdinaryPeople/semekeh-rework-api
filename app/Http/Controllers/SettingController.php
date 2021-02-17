@@ -85,7 +85,7 @@ class SettingController extends Controller
 
         return response([
             'message' => __('label.success.create', [
-                'data' => __('db_cache')
+                'data' => __('label.db_cache')
             ]),
             'table' => History::getAll()
         ]);

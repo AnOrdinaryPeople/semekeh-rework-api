@@ -67,7 +67,7 @@ class CacheCommand extends Command
             'section' => \App\Models\Section::orderBy('id')->get(['title', 'subtitle']),
             'prestation' => \App\Models\Prestation::latest()->limit(3)->get(['rank', 'title', 'url', 'year']),
             'agenda' => \App\Models\Agenda::latest()->first(['banner', 'content', 'slug', 'time', 'title']),
-            'news' => News::latest()->limit(3)->get(['title', 'banner', 'slug', 'created_at'])
+            'news' => \App\Models\News::latest()->limit(3)->get(['title', 'banner', 'slug', 'created_at'])
         ], timer());
 
         Cache::put('social', \App\Models\Social::latest()->get(['icon', 'link']), $timer);
