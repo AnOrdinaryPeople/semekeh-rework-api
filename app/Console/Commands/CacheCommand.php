@@ -108,7 +108,7 @@ class CacheCommand extends Command
                 ->get('url')
         ], $timer);
 
-        if($this->argument('token') === 'dQw4w9WgXcQ'){
+        if($this->argument('token') === 'dQw4w9WgXcQ' && $this->argument('timer') !== 'year'){
             \App\Models\History::create([
                 'user_id' => 0,
                 'duration' => $str,
