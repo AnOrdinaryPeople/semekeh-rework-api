@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\CacheCommand::class,
+        \App\Console\Commands\ClearHistoryCommand::class,
     ];
 
     /**
@@ -24,6 +25,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $schedule->call(function(){
+            \Illuminate\Support\Facades\Artisan::call('history:clear');
+            \Illuminate\Support\Facades\Artisan::call('cache:refresh', [
+                'token' => 'dQw4w9WgXcQ'
+            ]);
+        })->monthly();
     }
 }
