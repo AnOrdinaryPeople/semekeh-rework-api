@@ -38,6 +38,7 @@ class NewsSeeder extends Seeder
         	],
         ];
 
+		\App\Models\News::truncate();
         \App\Models\News::insert($a);
     }
 }

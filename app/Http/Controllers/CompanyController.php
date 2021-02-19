@@ -26,7 +26,7 @@ class CompanyController extends Controller
             DB::beginTransaction();
 
             Company::create([
-                'url' => storeImage('url', 'homepage'),
+                'url' => storeImage('url', 'homepage', $req),
                 'link' => $req->link
             ]);
 
@@ -44,7 +44,7 @@ class CompanyController extends Controller
     }
     public function update($id, Request $req){
         $this->validate($req, [
-            'url' => 'required|mimes:jpg,jpeg,png,webp|max:2048000',
+            'url' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048000',
             'link' => [
                 'required',
                 'string',
@@ -59,7 +59,7 @@ class CompanyController extends Controller
                 if($req->file('url')){
                     File::delete(toPath($check->url));
 
-                    $url = storeImage('url', 'homepage');
+                    $url = storeImage('url', 'homepage', $req);
                 }else $url = $check->url;
 
                 $check->update([

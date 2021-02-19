@@ -34,7 +34,7 @@ class FooterController extends Controller
         }
         return $r;
     }
-    public function update($id, FooterRequest $req){
+    public function update($id, Request $req){
         $this->validate($req, [
             'key' => 'required|string',
             'value' => 'required|string'
