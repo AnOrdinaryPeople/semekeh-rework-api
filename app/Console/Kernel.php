@@ -25,11 +25,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function(){
-            \Illuminate\Support\Facades\Artisan::call('history:clear');
+        // $schedule->call(function(){
+        //     \Illuminate\Support\Facades\Artisan::call('history:clear');
+        //     \Illuminate\Support\Facades\Artisan::call('cache:refresh', [
+        //         'token' => 'dQw4w9WgXcQ'
+        //     ]);
+        // })->monthly();
+
+        $schedule->command('history:clear')->monthly()->after(function (){
             \Illuminate\Support\Facades\Artisan::call('cache:refresh', [
                 'token' => 'dQw4w9WgXcQ'
             ]);
-        })->monthly();
+        });
     }
 }
